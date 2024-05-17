@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WannaHash - Crypto Exchange</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <link rel="icon" type="image/x-icon" href="https://cdn.discordapp.com/attachments/1221073635763028092/1224227674587660288/999.png?ex=661cb9de&is=660a44de&hm=7ab918f478c78d92544f7284cb61631a0116366f4748c001dbf6e36cd5095d0e&">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1f1f1f;
+            color: #ffffff;
+            position: relative;
+        }
+
+        nav {
+            background-color: #121212;
+            padding: 10px 20px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .tagline {
+            color: #ffffff;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .middle-left {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            font-size: 28px;
+        }
+
+        .bitcoin-counter {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .usd-value {
+            position: absolute;
+            top: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .buttons-container {
+            position: absolute;
+            top: 190px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 10px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #007bff;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 1001;
+            width: 300px;
+        }
+
+        .popup-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .popup-input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            background-color: #1f1f1f;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #121212;
+            color: #ffffff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">WannaHash</div>
+        <div class="tagline">Your Secure Crypto Exchange</div>
+    </nav>
+
+    <div class="middle-left">Anonymous, Safe, Secure</div>
+
+    <div class="bitcoin-counter" id="bitcoin-counter">BTC: <span id="btc-amount">0.00</span></div>
+
+    <div class="usd-value" id="usd-value"><span id="usd-amount">0.00</span></div>
+
+    <div class="buttons-container">
+        <button class="button" onclick="openAddPopup()">Add BTC</button>
+        <button class="button" onclick="openSendPopup()">Send BTC</button>
+    </div>
+
+    <!-- Add BTC Popup -->
+    <div class="popup" id="add-popup">
+        <div class="popup-content">
+            <h2>Add BTC</h2>
+            <label for="btc-input">Amount:</label>
+            <input type="number" id="btc-input" name="btc-input" min="0.00000001" class="popup-input">
+            <div class="popup-buttons">
+                <button class="button" onclick="addBTC()">Add</button>
+                <button class="button" onclick="closeAddPopup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send BTC Popup -->
+    <div class="popup" id="send-popup">
+        <div class="popup-content">
+            <h2>Send BTC</h2>
+            <label for="btc-recipient">Recipient:</label>
+            <input type="text" id="btc-recipient" name="btc-recipient" class="popup-input">
+            <label for="btc-amount-send">Amount:</label>
+            <input type="number" id="btc-amount-send" name="btc-amount-send" min="0.00000001" class="popup-input" style="margin-bottom: 5px;">
+            <div class="popup-buttons">
+                <button class="button" onclick="sendBTC()">Send</button>
+                <button class="button" onclick="closeSendPopup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copyright notice -->
+    <footer>&copy; 2024 WannaHash. All rights reserved.</footer>
+
+    <script>
+        let btcAmount = Math.random() * (2.5 - 0.00000001) + 0.00000001; // Generate random balance between 0.00000001 BTC and 2.50000000 BTC
+        const btcToUsdRate = 30000.00;
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function updateBitcoinCounter() {
+            document.getElementById('btc-amount').textContent = btcAmount.toFixed(8); // Format BTC amount to 8 decimal places
+            document.getElementById('usd-amount').textContent = '$' + numberWithCommas((btcAmount * btcToUsdRate).toFixed(2)); // Convert BTC to USD and format to 2 decimal places with commas
+        }
+
+        function openAddPopup() {
+            document.getElementById('add-popup').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddPopup() {
+            document.getElementById('add-popup').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function openSendPopup() {
+            document.getElementById('send-popup').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSendPopup() {
+            document.getElementById('send-popup').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function addBTC() {
+            const btcInput = parseFloat(document.getElementById('btc-input').value);
+            if (!isNaN(btcInput) && btcInput > 0) {
+                btcAmount += btcInput;
+                updateBitcoinCounter();
+                closeAddPopup();
+            } else {
+                alert('Please enter a valid positive number for BTC.');
+            }
+        }
+
+        function sendBTC() {
+            const amountToSend = parseFloat(document.getElementById('btc-amount-send').value);
+            if (!isNaN(amountToSend) && amountToSend > 0 && amountToSend <= btcAmount) {
+                btcAmount -= amountToSend;
+                updateBitcoinCounter();
+                closeSendPopup();
+            } else {
+                alert('Please enter a valid positive number for the amount to send.');
+            }
+        }
+
+        updateBitcoinCounter(); // Update Bitcoin counter on page load
+    </script>
+</body>
+
+</html>
